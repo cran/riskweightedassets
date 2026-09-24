@@ -1,0 +1,43 @@
+Package: riskweightedassets
+Type: Package
+Title: Reproducible Risk-Weighted Asset Calculations
+Version: 1.1.1
+Authors@R: c(
+    person(given = "Dimitrios", family = "Geromichalos",
+      email = "riskdatascience@web.de", role = "cre"),
+    person(given = "RiskDataScience", family = "GmbH",
+      role = c("aut", "cph"))
+    )
+Description: Provides transparent, deterministic and auditable calculations
+    of risk-weighted assets, own-funds requirements, interest-rate risk in the
+    banking book and related capital metrics. It supports canonical in-memory
+    tables and versioned spreadsheet datasets, strict validation, synthetic
+    reference profiles, bitemporal snapshots, calculation controls and
+    traceable regulatory source metadata. Methods are parameterised against
+    the European Parliament and Council (2013) Capital Requirements
+    Regulation <https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32013R0575> and its
+    amending Regulation (EU) 2024/1623
+    <https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1623>. A granular analyst API exposes
+    individual formulae, domain views, controls, schemas and auditable
+    parameter overrides. The implementation is intended for
+    analytical, educational and model-validation use and does not constitute
+    legal or supervisory advice.
+License: GPL-3
+Copyright: 2026 RiskDataScience GmbH
+URL: https://github.com/rds0001/risk-weighted-assets-r
+BugReports: https://github.com/rds0001/risk-weighted-assets-r/issues
+Encoding: UTF-8
+Date: 2026-09-14
+Depends: R (>= 4.1.0)
+Imports: digest, jsonlite, openxlsx, readxl, utils, yaml
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.3.1
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2026-09-14 16:20:54 UTC; qwert123
+Author: Dimitrios Geromichalos [cre],
+  RiskDataScience GmbH [aut, cph]
+Maintainer: Dimitrios Geromichalos <riskdatascience@web.de>
+Repository: CRAN
+Date/Publication: 2026-09-24 13:50:10 UTC

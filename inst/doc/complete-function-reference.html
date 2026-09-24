@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Complete public function reference</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Complete public function reference</h1>
+
+
+
+<div id="scope" class="section level2">
+<h2>Scope</h2>
+<p>This vignette is the task-oriented index for the complete public API of <code>riskweightedassets</code> 1.1.1. Every public function is listed below. Detailed arguments, return values, formulas, controls and runnable examples are provided by the corresponding R help page, for example <code>help(&quot;sa_exposure_value&quot;, package = &quot;riskweightedassets&quot;)</code>.</p>
+<p>The API separates individual formulas from portfolio orchestration so that a bank analyst can inspect an input, select a rule set, apply a governed parameter override, reproduce a metric and inspect the resulting control trail. Formula structure itself remains version-controlled code; runtime parameter changes are accepted only through the explicit override interface.</p>
+</div>
+<div id="end-to-end-calculation-and-validation" class="section level2">
+<h2>End-to-end calculation and validation</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Analyst purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>calculate_tables()</code></td>
+<td>Calculate applied and fully-loaded views from 68 canonical in-memory tables.</td>
+</tr>
+<tr class="even">
+<td><code>calculate_dataset()</code></td>
+<td>Validate and calculate a versioned workbook dataset and write controlled outputs.</td>
+</tr>
+<tr class="odd">
+<td><code>validate_dataset()</code></td>
+<td>Validate a workbook dataset without running the calculation engines.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="synthetic-data-workspaces-and-source-inventory" class="section level2">
+<h2>Synthetic data, workspaces and source inventory</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Analyst purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>generate_synthetic_tables()</code></td>
+<td>Create a complete synthetic bank profile as canonical data frames.</td>
+</tr>
+<tr class="even">
+<td><code>generate_synthetic_dataset()</code></td>
+<td>Materialise a synthetic profile as canonical workbooks.</td>
+</tr>
+<tr class="odd">
+<td><code>create_workspace()</code></td>
+<td>Create a caller-selected, writable reference workspace.</td>
+</tr>
+<tr class="even">
+<td><code>default_workspace()</code></td>
+<td>Resolve the configured default workspace without creating it.</td>
+</tr>
+<tr class="odd">
+<td><code>list_reference_profiles()</code></td>
+<td>List bundled synthetic bank profiles.</td>
+</tr>
+<tr class="even">
+<td><code>list_reference_datasets()</code></td>
+<td>List bundled reference-dataset metadata.</td>
+</tr>
+<tr class="odd">
+<td><code>regulatory_sources()</code></td>
+<td>Inspect official-source URLs, dates, hashes and redistribution status.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="parameters-rule-sets-schemas-and-governance" class="section level2">
+<h2>Parameters, rule sets, schemas and governance</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Analyst purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>regulatory_parameters()</code></td>
+<td>Return the complete effective regulatory parameter table.</td>
+</tr>
+<tr class="even">
+<td><code>regulatory_parameter()</code></td>
+<td>Resolve one parameter for explicit dimensions and dates.</td>
+</tr>
+<tr class="odd">
+<td><code>override_regulatory_parameters()</code></td>
+<td>Apply non-mutating, reasoned and approved parameter overrides.</td>
+</tr>
+<tr class="even">
+<td><code>parameter_overrides()</code></td>
+<td>Retrieve the old/new-value audit trail attached to a parameter set or result.</td>
+</tr>
+<tr class="odd">
+<td><code>formula_catalog()</code></td>
+<td>Inspect formula identifiers, versions and implementation coverage.</td>
+</tr>
+<tr class="even">
+<td><code>available_rule_sets()</code></td>
+<td>List available applied and fully-loaded rule sets.</td>
+</tr>
+<tr class="odd">
+<td><code>select_rule_set()</code></td>
+<td>Resolve one rule set by identifier and effective date.</td>
+</tr>
+<tr class="even">
+<td><code>table_dictionary()</code></td>
+<td>Inspect the canonical table inventory.</td>
+</tr>
+<tr class="odd">
+<td><code>table_schema()</code></td>
+<td>Inspect the field-level contract for one canonical table.</td>
+</tr>
+<tr class="even">
+<td><code>official_snapshot()</code></td>
+<td>Select an official bitemporal snapshot reproducibly.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="result-inspection-and-reconciliation" class="section level2">
+<h2>Result inspection and reconciliation</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Analyst purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>rwa_metrics()</code></td>
+<td>Return all headline metrics from a calculation result.</td>
+</tr>
+<tr class="even">
+<td><code>rwa_metric()</code></td>
+<td>Retrieve one named metric with strict name checking.</td>
+</tr>
+<tr class="odd">
+<td><code>rwa_result_tables()</code></td>
+<td>Return all detailed result tables.</td>
+</tr>
+<tr class="even">
+<td><code>rwa_result_table()</code></td>
+<td>Retrieve one detailed result table by name.</td>
+</tr>
+<tr class="odd">
+<td><code>rwa_table_names()</code></td>
+<td>List detailed result-table names.</td>
+</tr>
+<tr class="even">
+<td><code>rwa_controls()</code></td>
+<td>Return the complete reconciliation and control table.</td>
+</tr>
+<tr class="odd">
+<td><code>failed_controls()</code></td>
+<td>Return only controls that did not pass.</td>
+</tr>
+<tr class="even">
+<td><code>rwa_validation()</code></td>
+<td>Return the structured validation report.</td>
+</tr>
+<tr class="odd">
+<td><code>compare_calculation_views()</code></td>
+<td>Compare applied and fully-loaded metrics.</td>
+</tr>
+<tr class="even">
+<td><code>rwa_summary()</code></td>
+<td>Produce a compact analyst summary of metrics, controls and overrides.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="domain-analysis" class="section level2">
+<h2>Domain analysis</h2>
+<p>Each domain function extracts the relevant metrics, tables and controls into a <code>rwa_domain_analysis</code> object without rerunning the calculation.</p>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Domain</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>analyze_credit_risk()</code></td>
+<td>Standardised and IRB credit risk, CRM and exposure results.</td>
+</tr>
+<tr class="even">
+<td><code>analyze_counterparty_risk()</code></td>
+<td>Counterparty credit risk, SFT, CCP, CVA and settlement risk.</td>
+</tr>
+<tr class="odd">
+<td><code>analyze_securitisation()</code></td>
+<td>Securitisation approach selection and tranche calculations.</td>
+</tr>
+<tr class="even">
+<td><code>analyze_market_risk()</code></td>
+<td>Legacy and FRTB market-risk views.</td>
+</tr>
+<tr class="odd">
+<td><code>analyze_operational_risk()</code></td>
+<td>Business indicator and operational-risk requirement.</td>
+</tr>
+<tr class="even">
+<td><code>analyze_output_floor()</code></td>
+<td>Shadow standardised TREA, floor factor and uplift.</td>
+</tr>
+<tr class="odd">
+<td><code>analyze_capital_adequacy()</code></td>
+<td>Own funds, ratios, buffers, leverage, MREL and TLAC.</td>
+</tr>
+<tr class="even">
+<td><code>analyze_irrbb()</code></td>
+<td>EVE, NII, CSRBB and outlier-test measures.</td>
+</tr>
+<tr class="odd">
+<td><code>analyze_icaap()</code></td>
+<td>Economic capital, diversification and normative projections.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="standardised-credit-risk-and-credit-risk-mitigation-formulas" class="section level2">
+<h2>Standardised credit risk and credit risk mitigation formulas</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Formula unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sa_exposure_value()</code></td>
+<td>On- and off-balance-sheet exposure value before CRM.</td>
+</tr>
+<tr class="even">
+<td><code>sa_risk_weight()</code></td>
+<td>Standardised credit-risk weight selection.</td>
+</tr>
+<tr class="odd">
+<td><code>real_estate_risk_weight()</code></td>
+<td>Property exposure risk weight using class and ETV attributes.</td>
+</tr>
+<tr class="even">
+<td><code>crm_maturity_factor()</code></td>
+<td>Maturity mismatch adjustment for eligible protection.</td>
+</tr>
+<tr class="odd">
+<td><code>crm_adjusted_exposure()</code></td>
+<td>Comprehensive-method exposure after haircuts and protection.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="irb-formulas" class="section level2">
+<h2>IRB formulas</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Formula unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>irb_asset_correlation()</code></td>
+<td>Corporate/institution/sovereign asset correlation.</td>
+</tr>
+<tr class="even">
+<td><code>irb_retail_correlation()</code></td>
+<td>Retail asset correlation by retail subtype.</td>
+</tr>
+<tr class="odd">
+<td><code>irb_maturity_coefficient()</code></td>
+<td>PD-dependent maturity coefficient.</td>
+</tr>
+<tr class="even">
+<td><code>irb_maturity_factor()</code></td>
+<td>Effective-maturity adjustment.</td>
+</tr>
+<tr class="odd">
+<td><code>irb_capital_requirement()</code></td>
+<td>IRB unexpected-loss capital requirement and risk weight.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="counterparty-sft-cva-settlement-and-securitisation-formulas" class="section level2">
+<h2>Counterparty, SFT, CVA, settlement and securitisation formulas</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Formula unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sa_ccr_multiplier_value()</code></td>
+<td>SA-CCR PFE multiplier.</td>
+</tr>
+<tr class="even">
+<td><code>sa_ccr_exposure_value()</code></td>
+<td>SA-CCR exposure at default.</td>
+</tr>
+<tr class="odd">
+<td><code>sft_exposure_value()</code></td>
+<td>SFT comprehensive-method exposure value.</td>
+</tr>
+<tr class="even">
+<td><code>cva_basic_approach_capital()</code></td>
+<td>Basic-approach CVA capital requirement.</td>
+</tr>
+<tr class="odd">
+<td><code>settlement_risk_factor()</code></td>
+<td>Settlement-delay risk factor.</td>
+</tr>
+<tr class="even">
+<td><code>securitisation_irb_pool_capital()</code></td>
+<td>IRB pool capital input for SEC-IRBA.</td>
+</tr>
+<tr class="odd">
+<td><code>securitisation_sa_pool_capital()</code></td>
+<td>Standardised pool capital input for SEC-SA.</td>
+</tr>
+<tr class="even">
+<td><code>securitisation_ssfa_coefficient()</code></td>
+<td>Supervisory formula coefficient.</td>
+</tr>
+<tr class="odd">
+<td><code>securitisation_ssfa_risk_weight()</code></td>
+<td>SSFA tranche risk weight.</td>
+</tr>
+<tr class="even">
+<td><code>securitisation_irba_p()</code></td>
+<td>SEC-IRBA supervisory parameter.</td>
+</tr>
+<tr class="odd">
+<td><code>securitisation_erba_risk_weight()</code></td>
+<td>SEC-ERBA risk weight from rating and maturity.</td>
+</tr>
+<tr class="even">
+<td><code>securitisation_risk_weight()</code></td>
+<td>Governed hierarchy, floor and cap for tranche risk weight.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="operational-risk-output-floor-npe-and-tier-2-formulas" class="section level2">
+<h2>Operational risk, output floor, NPE and Tier 2 formulas</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Formula unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>business_indicator_component()</code></td>
+<td>Marginal-coefficient business indicator component.</td>
+</tr>
+<tr class="even">
+<td><code>applicable_output_floor_factor()</code></td>
+<td>Transitional or fully-loaded output-floor factor.</td>
+</tr>
+<tr class="odd">
+<td><code>apply_output_floor()</code></td>
+<td>Maximum of unfloored and floored TREA.</td>
+</tr>
+<tr class="even">
+<td><code>npe_unsecured_coverage_factor()</code></td>
+<td>Minimum unsecured NPE coverage factor.</td>
+</tr>
+<tr class="odd">
+<td><code>npe_secured_coverage_factor()</code></td>
+<td>Minimum secured NPE coverage factor.</td>
+</tr>
+<tr class="even">
+<td><code>tier2_eligible_amount()</code></td>
+<td>Amortised eligibility of a Tier 2 instrument.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="irrbb-aggregation-and-frtb-formulas" class="section level2">
+<h2>IRRBB, aggregation and FRTB formulas</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Formula unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>irrbb_scenario_shock()</code></td>
+<td>Scenario shock by tenor and currency parameters.</td>
+</tr>
+<tr class="even">
+<td><code>irrbb_shocked_zero_rate()</code></td>
+<td>Shocked, floored zero rate.</td>
+</tr>
+<tr class="odd">
+<td><code>present_value_discount_factor()</code></td>
+<td>Discount factor from zero rate and maturity.</td>
+</tr>
+<tr class="even">
+<td><code>aggregate_correlated_capital()</code></td>
+<td>Capital aggregation under a correlation matrix.</td>
+</tr>
+<tr class="odd">
+<td><code>frtb_scenario_correlation()</code></td>
+<td>FRTB correlation under low, medium or high scenario.</td>
+</tr>
+<tr class="even">
+<td><code>frtb_quadratic_charge()</code></td>
+<td>Quadratic sensitivity charge with correlation safeguards.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="s3-methods-and-object-behaviour" class="section level2">
+<h2>S3 methods and object behaviour</h2>
+<p>The package also registers five documented S3 methods. Users normally invoke the generic rather than calling the method directly.</p>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>print.rwa_calculation_result()</code></td>
+<td>Print a concise calculation status and headline summary.</td>
+</tr>
+<tr class="even">
+<td><code>print.rwa_domain_analysis()</code></td>
+<td>Print one domain-analysis summary.</td>
+</tr>
+<tr class="odd">
+<td><code>print.rwa_validation_report()</code></td>
+<td>Print validation counts and issues.</td>
+</tr>
+<tr class="even">
+<td><code>as.data.frame.rwa_validation_report()</code></td>
+<td>Convert validation issues to a stable data-frame contract.</td>
+</tr>
+<tr class="odd">
+<td><code>print.rwa_workspace()</code></td>
+<td>Print resolved workspace paths.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="controlled-analyst-example" class="section level2">
+<h2>Controlled analyst example</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(riskweightedassets)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>tables &lt;-<span class="st"> </span><span class="kw">generate_synthetic_tables</span>(<span class="dt">bank_profile =</span> <span class="st">&quot;KSA_BANK&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>overrides &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="dt">parameter_key =</span> <span class="st">&quot;SA_RW&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  <span class="dt">dimension_1 =</span> <span class="st">&quot;CORPORATE&quot;</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="dt">dimension_2 =</span> <span class="st">&quot;UNRATED&quot;</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  <span class="dt">parameter_value =</span> <span class="fl">0.40</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>adjusted_tables &lt;-<span class="st"> </span><span class="kw">override_regulatory_parameters</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  tables,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  overrides,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>  <span class="dt">reason =</span> <span class="st">&quot;Approved sensitivity scenario SCN-2026-09&quot;</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  <span class="dt">approved_by =</span> <span class="st">&quot;Model Risk Committee decision 2026-09-14&quot;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>result &lt;-<span class="st"> </span><span class="kw">calculate_tables</span>(adjusted_tables)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="kw">rwa_summary</span>(result)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="kw">failed_controls</span>(result)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="kw">parameter_overrides</span>(result)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="kw">analyze_credit_risk</span>(result)</span></code></pre></div>
+<p>The package is a transparent analytical reference implementation. Use with a real institution requires independent legal interpretation, data governance, model validation, change approval and regulatory reporting controls.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

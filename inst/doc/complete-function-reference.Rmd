@@ -1,0 +1,197 @@
+---
+title: "Complete public function reference"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Complete public function reference}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+## Scope
+
+This vignette is the task-oriented index for the complete public API of
+`riskweightedassets` 1.1.1. Every public function is listed below. Detailed
+arguments, return values, formulas, controls and runnable examples are provided
+by the corresponding R help page, for example
+`help("sa_exposure_value", package = "riskweightedassets")`.
+
+The API separates individual formulas from portfolio orchestration so that a
+bank analyst can inspect an input, select a rule set, apply a governed parameter
+override, reproduce a metric and inspect the resulting control trail. Formula
+structure itself remains version-controlled code; runtime parameter changes are
+accepted only through the explicit override interface.
+
+## End-to-end calculation and validation
+
+| Function | Analyst purpose |
+|---|---|
+| `calculate_tables()` | Calculate applied and fully-loaded views from 68 canonical in-memory tables. |
+| `calculate_dataset()` | Validate and calculate a versioned workbook dataset and write controlled outputs. |
+| `validate_dataset()` | Validate a workbook dataset without running the calculation engines. |
+
+## Synthetic data, workspaces and source inventory
+
+| Function | Analyst purpose |
+|---|---|
+| `generate_synthetic_tables()` | Create a complete synthetic bank profile as canonical data frames. |
+| `generate_synthetic_dataset()` | Materialise a synthetic profile as canonical workbooks. |
+| `create_workspace()` | Create a caller-selected, writable reference workspace. |
+| `default_workspace()` | Resolve the configured default workspace without creating it. |
+| `list_reference_profiles()` | List bundled synthetic bank profiles. |
+| `list_reference_datasets()` | List bundled reference-dataset metadata. |
+| `regulatory_sources()` | Inspect official-source URLs, dates, hashes and redistribution status. |
+
+## Parameters, rule sets, schemas and governance
+
+| Function | Analyst purpose |
+|---|---|
+| `regulatory_parameters()` | Return the complete effective regulatory parameter table. |
+| `regulatory_parameter()` | Resolve one parameter for explicit dimensions and dates. |
+| `override_regulatory_parameters()` | Apply non-mutating, reasoned and approved parameter overrides. |
+| `parameter_overrides()` | Retrieve the old/new-value audit trail attached to a parameter set or result. |
+| `formula_catalog()` | Inspect formula identifiers, versions and implementation coverage. |
+| `available_rule_sets()` | List available applied and fully-loaded rule sets. |
+| `select_rule_set()` | Resolve one rule set by identifier and effective date. |
+| `table_dictionary()` | Inspect the canonical table inventory. |
+| `table_schema()` | Inspect the field-level contract for one canonical table. |
+| `official_snapshot()` | Select an official bitemporal snapshot reproducibly. |
+
+## Result inspection and reconciliation
+
+| Function | Analyst purpose |
+|---|---|
+| `rwa_metrics()` | Return all headline metrics from a calculation result. |
+| `rwa_metric()` | Retrieve one named metric with strict name checking. |
+| `rwa_result_tables()` | Return all detailed result tables. |
+| `rwa_result_table()` | Retrieve one detailed result table by name. |
+| `rwa_table_names()` | List detailed result-table names. |
+| `rwa_controls()` | Return the complete reconciliation and control table. |
+| `failed_controls()` | Return only controls that did not pass. |
+| `rwa_validation()` | Return the structured validation report. |
+| `compare_calculation_views()` | Compare applied and fully-loaded metrics. |
+| `rwa_summary()` | Produce a compact analyst summary of metrics, controls and overrides. |
+
+## Domain analysis
+
+Each domain function extracts the relevant metrics, tables and controls into a
+`rwa_domain_analysis` object without rerunning the calculation.
+
+| Function | Domain |
+|---|---|
+| `analyze_credit_risk()` | Standardised and IRB credit risk, CRM and exposure results. |
+| `analyze_counterparty_risk()` | Counterparty credit risk, SFT, CCP, CVA and settlement risk. |
+| `analyze_securitisation()` | Securitisation approach selection and tranche calculations. |
+| `analyze_market_risk()` | Legacy and FRTB market-risk views. |
+| `analyze_operational_risk()` | Business indicator and operational-risk requirement. |
+| `analyze_output_floor()` | Shadow standardised TREA, floor factor and uplift. |
+| `analyze_capital_adequacy()` | Own funds, ratios, buffers, leverage, MREL and TLAC. |
+| `analyze_irrbb()` | EVE, NII, CSRBB and outlier-test measures. |
+| `analyze_icaap()` | Economic capital, diversification and normative projections. |
+
+## Standardised credit risk and credit risk mitigation formulas
+
+| Function | Formula unit |
+|---|---|
+| `sa_exposure_value()` | On- and off-balance-sheet exposure value before CRM. |
+| `sa_risk_weight()` | Standardised credit-risk weight selection. |
+| `real_estate_risk_weight()` | Property exposure risk weight using class and ETV attributes. |
+| `crm_maturity_factor()` | Maturity mismatch adjustment for eligible protection. |
+| `crm_adjusted_exposure()` | Comprehensive-method exposure after haircuts and protection. |
+
+## IRB formulas
+
+| Function | Formula unit |
+|---|---|
+| `irb_asset_correlation()` | Corporate/institution/sovereign asset correlation. |
+| `irb_retail_correlation()` | Retail asset correlation by retail subtype. |
+| `irb_maturity_coefficient()` | PD-dependent maturity coefficient. |
+| `irb_maturity_factor()` | Effective-maturity adjustment. |
+| `irb_capital_requirement()` | IRB unexpected-loss capital requirement and risk weight. |
+
+## Counterparty, SFT, CVA, settlement and securitisation formulas
+
+| Function | Formula unit |
+|---|---|
+| `sa_ccr_multiplier_value()` | SA-CCR PFE multiplier. |
+| `sa_ccr_exposure_value()` | SA-CCR exposure at default. |
+| `sft_exposure_value()` | SFT comprehensive-method exposure value. |
+| `cva_basic_approach_capital()` | Basic-approach CVA capital requirement. |
+| `settlement_risk_factor()` | Settlement-delay risk factor. |
+| `securitisation_irb_pool_capital()` | IRB pool capital input for SEC-IRBA. |
+| `securitisation_sa_pool_capital()` | Standardised pool capital input for SEC-SA. |
+| `securitisation_ssfa_coefficient()` | Supervisory formula coefficient. |
+| `securitisation_ssfa_risk_weight()` | SSFA tranche risk weight. |
+| `securitisation_irba_p()` | SEC-IRBA supervisory parameter. |
+| `securitisation_erba_risk_weight()` | SEC-ERBA risk weight from rating and maturity. |
+| `securitisation_risk_weight()` | Governed hierarchy, floor and cap for tranche risk weight. |
+
+## Operational risk, output floor, NPE and Tier 2 formulas
+
+| Function | Formula unit |
+|---|---|
+| `business_indicator_component()` | Marginal-coefficient business indicator component. |
+| `applicable_output_floor_factor()` | Transitional or fully-loaded output-floor factor. |
+| `apply_output_floor()` | Maximum of unfloored and floored TREA. |
+| `npe_unsecured_coverage_factor()` | Minimum unsecured NPE coverage factor. |
+| `npe_secured_coverage_factor()` | Minimum secured NPE coverage factor. |
+| `tier2_eligible_amount()` | Amortised eligibility of a Tier 2 instrument. |
+
+## IRRBB, aggregation and FRTB formulas
+
+| Function | Formula unit |
+|---|---|
+| `irrbb_scenario_shock()` | Scenario shock by tenor and currency parameters. |
+| `irrbb_shocked_zero_rate()` | Shocked, floored zero rate. |
+| `present_value_discount_factor()` | Discount factor from zero rate and maturity. |
+| `aggregate_correlated_capital()` | Capital aggregation under a correlation matrix. |
+| `frtb_scenario_correlation()` | FRTB correlation under low, medium or high scenario. |
+| `frtb_quadratic_charge()` | Quadratic sensitivity charge with correlation safeguards. |
+
+## S3 methods and object behaviour
+
+The package also registers five documented S3 methods. Users normally invoke
+the generic rather than calling the method directly.
+
+| Method | Behaviour |
+|---|---|
+| `print.rwa_calculation_result()` | Print a concise calculation status and headline summary. |
+| `print.rwa_domain_analysis()` | Print one domain-analysis summary. |
+| `print.rwa_validation_report()` | Print validation counts and issues. |
+| `as.data.frame.rwa_validation_report()` | Convert validation issues to a stable data-frame contract. |
+| `print.rwa_workspace()` | Print resolved workspace paths. |
+
+## Controlled analyst example
+
+```{r, eval=FALSE}
+library(riskweightedassets)
+
+tables <- generate_synthetic_tables(bank_profile = "KSA_BANK")
+overrides <- data.frame(
+  parameter_key = "SA_RW",
+  dimension_1 = "CORPORATE",
+  dimension_2 = "UNRATED",
+  parameter_value = 0.40
+)
+
+adjusted_tables <- override_regulatory_parameters(
+  tables,
+  overrides,
+  reason = "Approved sensitivity scenario SCN-2026-09",
+  approved_by = "Model Risk Committee decision 2026-09-14"
+)
+
+result <- calculate_tables(adjusted_tables)
+
+rwa_summary(result)
+failed_controls(result)
+parameter_overrides(result)
+analyze_credit_risk(result)
+```
+
+The package is a transparent analytical reference implementation. Use with a
+real institution requires independent legal interpretation, data governance,
+model validation, change approval and regulatory reporting controls.
