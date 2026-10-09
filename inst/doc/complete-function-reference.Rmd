@@ -11,10 +11,30 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
+## Default formula migration in 1.2.1
+
+Default `irb_capital_requirement()` calls now require `lgd_treatment`:
+`"SUPERVISORY"` yields K = 0; `"OWN_ESTIMATES"` yields max(LGD - ELBE, 0).
+Default PD is normalised to one; PD = 1 without default fails.
+See `vignette("irb-defaults")` for examples and capital consequences.
+
+## Canonical flags in 1.2.2
+
+`calculate_tables()` normalises exposure defaults once for both reporting views.
+SA and IRB detail expose `defaulted`. Invalid flags fail closed; see
+`vignette("default-flags")` for the accepted scalar representations and reference cases.
+
+## Snapshot times in 1.2.3
+
+`official_snapshot()` preserves ISO time-of-day from `run_config` and shares
+its UTC parser with `calculate_tables()`. POSIXt values, ISO T/space strings,
+optional Z and fractional seconds are accepted. Date-only inputs denote midnight.
+Malformed or non-scalar timestamps are rejected. See `?official_snapshot`.
+
 ## Scope
 
 This vignette is the task-oriented index for the complete public API of
-`riskweightedassets` 1.1.1. Every public function is listed below. Detailed
+`riskweightedassets` 1.2.3. Every public function is listed below. Detailed
 arguments, return values, formulas, controls and runnable examples are provided
 by the corresponding R help page, for example
 `help("sa_exposure_value", package = "riskweightedassets")`.
@@ -111,6 +131,27 @@ Each domain function extracts the relevant metrics, tables and controls into a
 | `irb_maturity_coefficient()` | PD-dependent maturity coefficient. |
 | `irb_maturity_factor()` | Effective-maturity adjustment. |
 | `irb_capital_requirement()` | IRB unexpected-loss capital requirement and risk weight. |
+
+## Credit supporting factors
+
+| Function | Formula unit |
+|---|---|
+| `sme_supporting_factor()` | Weighted Article 501 SME factor using reviewed E* in EUR. |
+| `infrastructure_supporting_factor()` | Governed Article 501a infrastructure factor. |
+| `apply_credit_supporting_factors()` | Apply independent SME and infrastructure factors once. |
+| `irb_risk_weighted_assets()` | EAD times RWA multiplier times K and eligible support factors. |
+
+These are arithmetic helpers, not eligibility certificates. The table API
+requires explicit eligibility, evidence and approval; it validates the selected
+exposure context. See the installed `supporting-factors` vignette for migration,
+legacy warnings, audit outputs and the independent output-floor paths.
+
+```{r supporting-factor-example}
+library(riskweightedassets)
+factor <- sme_supporting_factor(5000000)
+irb_risk_weighted_assets(1000000, 0.08, sme_factor = factor,
+                        infrastructure_factor = infrastructure_supporting_factor())
+```
 
 ## Counterparty, SFT, CVA, settlement and securitisation formulas
 

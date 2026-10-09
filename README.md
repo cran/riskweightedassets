@@ -24,15 +24,28 @@ advice and is not a certified regulatory reporting system.
 - applied and fully-loaded views from the same official snapshot;
 - two complete synthetic bank profiles and Python 1.0.0 golden-master parity.
 
+## Credit supporting factors
+
+The IRB path now applies explicitly eligible SME and infrastructure supporting
+factors without changing K or expected loss. SA and IRB attestations are
+independent; factors feed each output-floor path exactly once. Four new public
+formula functions expose the arithmetic. Historical SA reductions without
+eligibility evidence remain reproducible but produce an explicit warning.
+
+After installation, see `vignette("supporting-factors", package = "riskweightedassets")`
+and [the supporting-factor guide](https://github.com/rds0001/risk-weighted-assets-r/blob/main/docs/SUPPORTING_FACTORS.md).
+The complete-function-reference vignette covers all 77 exports.
+
 ## Installation
 
-During development, build and install the local source package:
+To test the 1.2.4 update candidate before CRAN publication, install its source package:
 
 ```r
-install.packages("riskweightedassets_1.1.1.tar.gz", repos = NULL, type = "source")
+install.packages("riskweightedassets_1.2.4.tar.gz", repos = NULL, type = "source")
 ```
 
-After CRAN acceptance the standard command will be:
+Install the currently published CRAN version with the following command. It installs
+1.2.4 only after CRAN has accepted and published this update:
 
 ```r
 install.packages("riskweightedassets")
@@ -51,7 +64,7 @@ result$metrics[c("RWEA_KSA", "RWEA_IRB", "TREA", "CET1_RATIO")]
 
 ## Granular analyst API
 
-The package exposes 73 documented public functions. Analysts can calculate an
+The package exposes 77 documented public functions. Analysts can calculate an
 individual formula, inspect or override a regulatory weight, extract one
 result table, compare applied and fully-loaded metrics, or obtain a focused
 risk-domain analysis without using private package internals.

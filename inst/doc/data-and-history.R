@@ -9,7 +9,7 @@ head(tables$exposure_lot[c("record_id", "business_key", "valid_from",
                            "known_from", "is_official")])
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  report <- validate_dataset("path/to/dataset")
-#  issues <- as.data.frame(report)
-#  subset(issues, severity == "ERROR")
+# report <- validate_dataset("path/to/dataset")
+# issues <- as.data.frame(report)
+# subset(issues, severity == "ERROR")
 

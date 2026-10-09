@@ -1,7 +1,7 @@
 Package: riskweightedassets
 Type: Package
 Title: Reproducible Risk-Weighted Asset Calculations
-Version: 1.1.1
+Version: 1.2.4
 Authors@R: c(
     person(given = "Dimitrios", family = "Geromichalos",
       email = "riskdatascience@web.de", role = "cre"),
@@ -27,17 +27,17 @@ Copyright: 2026 RiskDataScience GmbH
 URL: https://github.com/rds0001/risk-weighted-assets-r
 BugReports: https://github.com/rds0001/risk-weighted-assets-r/issues
 Encoding: UTF-8
-Date: 2026-09-14
+Date: 2026-10-09
 Depends: R (>= 4.1.0)
 Imports: digest, jsonlite, openxlsx, readxl, utils, yaml
 Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
 Config/testthat/edition: 3
-RoxygenNote: 7.3.1
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-09-14 16:20:54 UTC; qwert123
+Packaged: 2026-10-09 10:54:24 UTC; qwert123
 Author: Dimitrios Geromichalos [cre],
   RiskDataScience GmbH [aut, cph]
 Maintainer: Dimitrios Geromichalos <riskdatascience@web.de>
 Repository: CRAN
-Date/Publication: 2026-09-24 13:50:10 UTC
+Date/Publication: 2026-10-09 12:20:02 UTC

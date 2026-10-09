@@ -55,40 +55,56 @@ calculate_irrbb <- function(t, ctx, out) {
          formula_id = "IRRBB_NII")
   })
   out$results$IRRBB_Repricing_Gap <- rows_frame(gap_rows)
-  currency_groups <- split(cf, cf$currency)
-  base_pv_by_currency <- vapply(names(currency_groups), function(currency) {
-    g <- currency_groups[[currency]]; currency_curve <- curve[as.character(curve$currency) == currency, , drop = FALSE]
+  # Curves and cashflow times do not change between shock scenarios. Prepare
+  # them once per currency, retaining original row order for all accumulations.
+  cf$.irrbb_index <- seq_len(nrow(cf))
+  cf$.signed_value <- vapply(cf$signed_cf, rwa_num, numeric(1))
+  currency_groups <- lapply(split(cf, cf$currency), function(g) {
+    currency <- as.character(g$currency[[1L]])
+    currency_curve <- curve[as.character(curve$currency) == currency, , drop = FALSE]
     if (!nrow(currency_curve)) stop(sprintf("IRRBB yield curve missing for %s", currency), call. = FALSE)
-    sum(vapply(seq_len(nrow(g)), function(i) {
-      rwa_num(g$signed_cf[[i]]) * discount_factor(interpolate_curve(currency_curve, rwa_num(g$t[[i]])), rwa_num(g$t[[i]]))
-    }, numeric(1)))
+    g$base_rate <- interpolate_curve(currency_curve, as.numeric(g$t))
+    g$base_discount <- discount_factor(g$base_rate, as.numeric(g$t))
+    g
+  })
+  base_pv_by_currency <- vapply(currency_groups, function(g) {
+    sum(g$.signed_value * g$base_discount)
   }, numeric(1))
   base_pv <- sum(base_pv_by_currency); currency_rows <- list(); nii_band_rows <- list()
   for (i in seq_len(nrow(scenarios))) {
     s <- scenarios[i, , drop = FALSE]; scenario <- as.character(s$scenario_type); currency <- as.character(s$currency)
-    currency_cf <- cf[as.character(cf$currency) == currency, , drop = FALSE]
-    if (!nrow(currency_cf)) next
-    currency_curve <- curve[as.character(curve$currency) == currency, , drop = FALSE]
+    currency_cf <- currency_groups[[currency]]
+    if (is.null(currency_cf) || !nrow(currency_cf)) next
     bp_unit <- parameter_get(p, "IRRBB_MODEL", "BASIS_POINTS_PER_UNIT")
     parallel <- rwa_num(s$parallel_bp) / bp_unit; short <- rwa_num(s$short_bp) / bp_unit
-    long <- rwa_num(s$long_bp) / bp_unit; pv <- 0
-    for (j in seq_len(nrow(currency_cf))) {
-      r <- currency_cf[j, , drop = FALSE]; tv <- rwa_num(r$t)
-      base <- interpolate_curve(currency_curve, tv)
+    long <- rwa_num(s$long_bp) / bp_unit
+    times <- as.numeric(currency_cf$t)
+    unique_times <- unique(times)
+    base_rates <- currency_cf$base_rate[match(unique_times, times)]
+    # Keep the existing scalar shock/floor formulae, including their parameter
+    # validation. Equal maturities within one currency/scenario need only one
+    # evaluation; nothing is cached across calls or parameter overrides.
+    shocked_rates <- vapply(seq_along(unique_times), function(j) {
+      tv <- unique_times[[j]]; base <- base_rates[[j]]
       shock <- irrbb_shock(scenario, tv, parallel, short, long, p)
-      pv <- pv + rwa_num(r$signed_cf) * discount_factor(shocked_zero_rate(base, shock, tv, p), tv)
-    }
+      shocked_zero_rate(base, shock, tv, p)
+    }, numeric(1))
+    discounted <- currency_cf$.signed_value *
+      discount_factor(shocked_rates[match(times, unique_times)], times)
+    pv <- 0
+    for (amount in discounted) pv <- pv + amount
     delta <- pv - base_pv_by_currency[[currency]]; nii_delta <- 0
     band_contributions <- setNames(numeric(length(unique(currency_cf$repricing_band))), unique(currency_cf$repricing_band))
+    horizon <- parameter_get(p, "IRRBB_MODEL", "HORIZON_YEARS")
     for (j in seq_len(nrow(currency_cf))) {
-      r <- currency_cf[j, , drop = FALSE]
-      repr_t <- max(as.numeric(as.Date(r$repricing_date) - ctx$as_of_date) / days_per_year, 0)
-      horizon <- parameter_get(p, "IRRBB_MODEL", "HORIZON_YEARS")
+      repr_t <- max(currency_cf$repricing_t[[j]], 0)
       if (repr_t <= horizon) {
         shock <- irrbb_shock(scenario, max(repr_t, RWA_EPSILON), parallel, short, long, p)
-        contribution <- rwa_num(r$principal_amount) * rwa_num(r$sign, 1) * shock * max(horizon - repr_t, 0)
+        contribution <- rwa_num(currency_cf$principal_amount[[j]]) *
+          rwa_num(currency_cf$sign[[j]], 1) * shock * max(horizon - repr_t, 0)
         nii_delta <- nii_delta + contribution
-        band <- as.character(r$repricing_band); band_contributions[[band]] <- band_contributions[[band]] + contribution
+        band <- as.character(currency_cf$repricing_band[[j]])
+        band_contributions[[band]] <- band_contributions[[band]] + contribution
       }
     }
     for (band in names(band_contributions)) nii_band_rows[[length(nii_band_rows) + 1L]] <- list(
@@ -117,11 +133,9 @@ calculate_irrbb <- function(t, ctx, out) {
   z <- deterministic_normals(parameter_get(p, "IRRBB_MODEL", "SIMULATION_PATHS"),
                              parameter_get(p, "IRRBB_MODEL", "RATE_VOLATILITY"),
                              parameter_get(p, "IRRBB_MODEL", "RANDOM_SEED"))
-  duration_proxy <- sum(vapply(seq_len(nrow(cf)), function(i) {
-    r <- cf[i, , drop = FALSE]; currency_curve <- curve[as.character(curve$currency) == as.character(r$currency), , drop = FALSE]
-    abs(rwa_num(r$signed_cf)) * rwa_num(r$t) *
-      discount_factor(interpolate_curve(currency_curve, rwa_num(r$t)), rwa_num(r$t))
-  }, numeric(1)))
+  base_discounts <- numeric(nrow(cf))
+  for (g in currency_groups) base_discounts[g$.irrbb_index] <- g$base_discount
+  duration_proxy <- sum(abs(cf$.signed_value) * as.numeric(cf$t) * base_discounts)
   losses <- pmax(z * duration_proxy, 0)
   var <- as.numeric(stats::quantile(losses, parameter_get(p, "IRRBB_MODEL", "VAR_CONFIDENCE"), names = FALSE, type = 7))
   es <- if (any(losses >= var)) mean(losses[losses >= var]) else var

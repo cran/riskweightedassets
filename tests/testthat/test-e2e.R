@@ -66,10 +66,7 @@ python_golden <- list(
 
 test_that("both complete reference profiles match Python 1.0.0", {
   for (profile in names(python_golden)) {
-    result <- calculate_tables(
-      generate_synthetic_tables(bank_profile = profile),
-      run_id = paste0("TEST-", profile)
-    )
+    result <- full_reference_result(profile)
     expected <- python_golden[[profile]]
     expect_setequal(names(result$metrics), c(names(expected), "FLOOR_BINDING"))
     actual <- unlist(result$metrics[names(expected)], use.names = TRUE)

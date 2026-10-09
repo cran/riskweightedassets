@@ -3,6 +3,8 @@
 
 calculate_credit <- function(t, ctx, out) {
   p <- ctx$parameters
+  # Resolve each selected exposure once, before either SA or IRB branches.
+  t <- normalize_exposure_defaults(t)
   exp_df <- t$exposure_lot
   sa <- t$sa_classification
   re_df <- t$real_estate_exposure
@@ -41,7 +43,7 @@ calculate_credit <- function(t, ctx, out) {
     rw <- sa_base_risk_weight(
       as.character(r$exposure_class), as.integer(rwa_num(r$credit_quality_step)),
       rwa_bool(r$short_term_flag), rwa_bool(r$transactor_flag),
-      rwa_bool(r$retail_eligible_flag), rwa_bool(r$default_flag), coverage,
+      rwa_bool(r$retail_eligible_flag), r$default_flag, coverage,
       rwa_text(row_value(r, "specialised_lending_type")), p)
     segments <- data.frame()
     if (!is.na(row_value(r, "property_type", NA))) {
@@ -61,19 +63,24 @@ calculate_credit <- function(t, ctx, out) {
     sub_rw <- rwa_num(row_value(r, "substitution_rw", rw), rw)
     rwea_pre <- ead * rw
     rwea_post <- unprotected * rw + protected * sub_rw
-    sf <- rwa_num(row_value(r, "supporting_factor", 1), 1)
+    support <- resolve_support_exposure(t, r, p, "SA")
+    sf <- support$supporting_factor
     rwea_final <- rwea_post * sf
     rows[[i]] <- list(
       exposure_id = as.character(r$exposure_id), approach = as.character(r$approach),
       exposure_class = as.character(r$exposure_class), ead_on = ead_on,
       ead_off = ead_off, ccf = parameter_get(p, "SA_CCF", as.character(r$annex_i_class)),
       ead = ead, risk_weight = rw, protected_amount = protected,
+      defaulted = r$default_flag,
       substitution_rw = sub_rw, rwea_pre_crm = rwea_pre, rwea_post_crm = rwea_post,
       supporting_factor = sf, rwea = rwea_final,
       actual_rwea = if (identical(as.character(r$approach), "KSA")) rwea_final else 0,
       shadow_rwea = rwea_final,
       segments = if (nrow(segments)) paste(capture.output(dput(segments)), collapse = "") else "[]",
       formula_id = "SA_EAD/SA_RW", formula_version = ctx$formula_version)
+    rows[[i]][names(support)] <- support
+    rows[[i]]$rwea_pre_supporting_factor <- rwea_post
+    rows[[i]]$supporting_factor_relief <- rwea_post - rwea_final
   }
   sa_result <- rows_frame(rows)
   out$results$SA_Detail <- sa_result
@@ -104,32 +111,51 @@ calculate_credit <- function(t, ctx, out) {
     irb_rows <- vector("list", nrow(base))
     for (i in seq_len(nrow(base))) {
       r <- base[i, , drop = FALSE]
-      pdv <- max(rwa_num(r$pd_estimate), rwa_num(r$pd_floor))
+      defaulted <- r$default_flag
+      pdv <- irb_effective_pd(r$pd_estimate, defaulted, r$pd_floor)
       lgd <- max(rwa_num(r$lgd_estimate), rwa_num(r$lgd_floor))
       ead <- max(rwa_num(r$ead_estimate), rwa_num(r$ead_floor))
-      defaulted <- rwa_bool(r$default_flag); subclass <- as.character(r$irb_subclass)
+      subclass <- as.character(r$irb_subclass)
+      treatment <- irb_treatment_for(as.character(r$irb_approach), subclass)
       retail <- startsWith(subclass, "RETAIL")
       sales <- rwa_num(row_value(r, "annual_sales_eur", 0))
       corr <- if (retail) retail_correlation(pdv, subclass, p) else
         irb_correlation(pdv, if (sales) sales / 1e6 else NULL,
                         rwa_bool(r$financial_multiplier_flag), p)
       k <- irb_k(pdv, lgd, corr, rwa_num(r$maturity_years, 1), !retail,
-                 defaulted, rwa_num(r$elbe), p)
+                 defaulted, r$elbe, p, treatment)
       rw <- parameter_get(p, "RWA_MULTIPLIER", "PILLAR1") * k
-      rwea <- ead * rw; el_rate <- if (defaulted) rwa_num(r$elbe) else pdv * lgd
+      support <- resolve_support_exposure(t, r, p, "IRB")
+      rwea_before <- ead * rw
+      rwea <- rwea_before * support$supporting_factor
+      el_rate <- irb_resolve(pdv, lgd, defaulted, r$elbe, treatment)$el_rate
       coverage <- rwa_num(r$specific_credit_adjustments) + rwa_num(r$general_credit_adjustments)
       el <- ead * el_rate
       irb_rows[[i]] <- list(
         exposure_id = as.character(r$exposure_id), irb_approach = as.character(r$irb_approach),
         subclass = subclass, ead = ead, pd = pdv, lgd = lgd, r = corr,
+        pd_input = as.numeric(r$pd_estimate), defaulted = defaulted, lgd_treatment = treatment,
         m = rwa_num(r$maturity_years), k = k, rw = rw, rwea = rwea,
         el_rate = el_rate, el_amount = el, coverage = coverage,
         irb_shortfall = max(el - coverage, 0), irb_excess = max(coverage - el, 0),
         formula_id = if (retail) "IRB_RETAIL_K" else "IRB_CORP_K",
         formula_version = ctx$formula_version)
+      irb_rows[[i]][names(support)] <- support
+      irb_rows[[i]]$rwea_pre_supporting_factor <- rwea_before
+      irb_rows[[i]]$supporting_factor_relief <- rwea_before - rwea
+      irb_rows[[i]]$effective_rw <- rw * support$supporting_factor
     }
     irb_result <- rows_frame(irb_rows)
   }
+  if (!nrow(irb_result)) {
+    fields <- c(names(resolve_support(list(), NULL, "IRB")), "rwea_pre_supporting_factor",
+                "supporting_factor_relief", "effective_rw")
+    for (name in fields) irb_result[[name]] <- logical()
+  }
+  match_sa <- match(as.character(irb_result$exposure_id), as.character(sa_result$exposure_id))
+  irb_result$sa_comparison_supporting_factor <- sa_result$supporting_factor[match_sa]
+  irb_result$supporting_factor_path_difference <- abs(as.numeric(irb_result$supporting_factor) -
+    as.numeric(irb_result$sa_comparison_supporting_factor)) > 1e-10
   out$results$IRB_Detail <- irb_result
   out$metrics$RWEA_IRB <- sum_column(irb_result, "rwea")
   out$metrics$IRB_EL <- sum_column(irb_result, "el_amount")
@@ -141,4 +167,3 @@ calculate_credit <- function(t, ctx, out) {
               "SA and IRB detail reconciliation")
   invisible(out)
 }
-

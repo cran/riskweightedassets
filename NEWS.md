@@ -1,11 +1,49 @@
-# riskweightedassets 1.1.1
+# riskweightedassets 1.2.4
 
-* Corrected README links to additional documentation and the GPL license so
-  they also resolve outside a GitHub checkout, including in the CRAN tarball.
-* Replaced two regulatory citation URLs with official EUR-Lex CELEX links.
-* Documented the initial Windows incoming-check notes and added an archive-level
-  README link audit to the local release checks.
-* No changes to calculation functions, the public API or synthetic data.
+* Address the CRAN incoming Windows overall-checktime finding for 1.2.3.
+  Prepare IRRBB yield curves and discount factors once per currency and evaluate
+  repeated maturities once per scenario. Keep the existing scalar shock/floor
+  formulae and original cashflow accumulation order; no cross-run cache.
+* Preserve the public API, regulatory parameters, reference datasets and all
+  existing test assertions. Add scalar-reference regression coverage for multiple
+  currencies, repeated maturities, negative rates, overrides and input errors.
+* This CRAN candidate retains all correctness fixes from 1.2.0 through 1.2.3.
+  GitHub publication is independent and is not changed by this resubmission.
+
+# riskweightedassets 1.2.3
+
+* Preserve the full UTC knowledge timestamp in official_snapshot(), including
+  ISO strings from run_config; use the same parser in portfolio calculations.
+* Add regression coverage for implicit/explicit snapshots, date-only and
+  fractional-second timestamps, missing values and malformed input.
+* Includes all corrections from 1.2.0–1.2.2 in the CRAN update from 1.1.1.
+* Reduce repeated full-portfolio work in targeted credit regression tests;
+  retain every existing assertion and both complete numerical reference profiles.
+  Reuse test-only inputs/results without changing production code or reference data.
+
+# riskweightedassets 1.2.2
+
+* Fixed inconsistent default_flag parsing between Standardised Approach and IRB.
+  Accepted representations are normalised once and shared by SA, IRB, KSA and
+  output-floor calculations; missing or ambiguous flags now fail closed.
+* Added SA_Detail.defaulted, shared Python/R vectors, and public portfolio tests.
+* Existing 1.2.1 default LGD-treatment contract and reference parameters retained.
+
+# riskweightedassets 1.2.1
+
+* Corrected supervisory-LGD FIRB defaults: K/RW/RWEA = 0; EL = LGD * EAD.
+* Unified default/PD handling; retained original PD and resolved LGD treatment.
+* Default formula calls require explicit lgd_treatment. Unsupported combinations
+  fail closed, including slotting (no separate implementation).
+* Added public-API default/capital regressions and documented API migration.
+
+# riskweightedassets 1.2.0
+
+* Added four documented public supporting-factor functions (77 exports).
+* Applied verified SME/infrastructure factors to IRB RWEA without changing K or EL.
+* Added compatible optional Excel fields, traceable evidence and floor-path diagnostics.
+* Preserved legacy SA factors with explicit unverified-eligibility warnings.
+* Added boundary, eligibility, regression and output-floor tests.
 
 # riskweightedassets 1.1.0
 

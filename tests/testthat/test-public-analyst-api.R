@@ -1,5 +1,9 @@
 test_that("all granular formula exports execute through the public API", {
   calls <- list(
+    sme_supporting_factor = quote(sme_supporting_factor(5000000)),
+    infrastructure_supporting_factor = quote(infrastructure_supporting_factor()),
+    apply_credit_supporting_factors = quote(apply_credit_supporting_factors(100, .7619, .75)),
+    irb_risk_weighted_assets = quote(irb_risk_weighted_assets(1000000, .08)),
     sa_exposure_value = quote(sa_exposure_value(100, 2, 0, 0, 40, "CLASS_2")),
     sa_risk_weight = quote(sa_risk_weight("CENTRAL_GOVERNMENT", 1)),
     real_estate_risk_weight = quote(real_estate_risk_weight(80, 100, "RESIDENTIAL", TRUE, 1)),
@@ -35,6 +39,7 @@ test_that("all granular formula exports execute through the public API", {
     frtb_scenario_correlation = quote(frtb_scenario_correlation(.25, "HIGH")),
     frtb_quadratic_charge = quote(frtb_quadratic_charge(c(1, -2), .5))
   )
+  expect_length(calls, 38L)
   values <- lapply(calls, eval, envir = parent.frame())
   expect_true(all(vapply(values, function(x) length(x) > 0L, logical(1))))
 })
@@ -57,7 +62,7 @@ test_that("analysts control parameters non-destructively with an audit trail", {
 })
 
 test_that("one result supports granular analyst views and applied/full comparison", {
-  result <- calculate_tables(generate_synthetic_tables(bank_profile = "KSA_BANK"))
+  result <- full_reference_result("KSA_BANK")
   expect_length(result$parallel_metrics, 63L)
   expect_length(result$parallel_results, 34L)
   expect_equal(nrow(failed_controls(result)), 0L)
@@ -77,7 +82,14 @@ test_that("one result supports granular analyst views and applied/full compariso
 
 test_that("every exported function has an Rd alias", {
   exports <- getNamespaceExports("riskweightedassets")
-  aliases <- unique(unlist(lapply(tools::Rd_db("riskweightedassets"), function(rd) {
+  rd_database <- tools::Rd_db("riskweightedassets")
+  # Recent pkgload versions do not populate the installed help database when
+  # loading source. Parse the actual source manpages instead; never skip coverage.
+  if (!length(rd_database)) {
+    man <- system.file("man", package = "riskweightedassets")
+    rd_database <- lapply(list.files(man, pattern = "[.]Rd$", full.names = TRUE), tools::parse_Rd)
+  }
+  aliases <- unique(unlist(lapply(rd_database, function(rd) {
     nodes <- rd[vapply(rd, function(node) identical(attr(node, "Rd_tag"), "\\alias"), logical(1))]
     vapply(nodes, function(node) as.character(node[[1L]]), character(1))
   }), use.names = FALSE))

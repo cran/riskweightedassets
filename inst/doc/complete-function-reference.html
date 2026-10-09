@@ -356,9 +356,21 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
+<div id="default-formula-migration-in-1.2.1" class="section level2">
+<h2>Default formula migration in 1.2.1</h2>
+<p>Default <code>irb_capital_requirement()</code> calls now require <code>lgd_treatment</code>: <code>&quot;SUPERVISORY&quot;</code> yields K = 0; <code>&quot;OWN_ESTIMATES&quot;</code> yields max(LGD - ELBE, 0). Default PD is normalised to one; PD = 1 without default fails. See <code>vignette(&quot;irb-defaults&quot;)</code> for examples and capital consequences.</p>
+</div>
+<div id="canonical-flags-in-1.2.2" class="section level2">
+<h2>Canonical flags in 1.2.2</h2>
+<p><code>calculate_tables()</code> normalises exposure defaults once for both reporting views. SA and IRB detail expose <code>defaulted</code>. Invalid flags fail closed; see <code>vignette(&quot;default-flags&quot;)</code> for the accepted scalar representations and reference cases.</p>
+</div>
+<div id="snapshot-times-in-1.2.3" class="section level2">
+<h2>Snapshot times in 1.2.3</h2>
+<p><code>official_snapshot()</code> preserves ISO time-of-day from <code>run_config</code> and shares its UTC parser with <code>calculate_tables()</code>. POSIXt values, ISO T/space strings, optional Z and fractional seconds are accepted. Date-only inputs denote midnight. Malformed or non-scalar timestamps are rejected. See <code>?official_snapshot</code>.</p>
+</div>
 <div id="scope" class="section level2">
 <h2>Scope</h2>
-<p>This vignette is the task-oriented index for the complete public API of <code>riskweightedassets</code> 1.1.1. Every public function is listed below. Detailed arguments, return values, formulas, controls and runnable examples are provided by the corresponding R help page, for example <code>help(&quot;sa_exposure_value&quot;, package = &quot;riskweightedassets&quot;)</code>.</p>
+<p>This vignette is the task-oriented index for the complete public API of <code>riskweightedassets</code> 1.2.3. Every public function is listed below. Detailed arguments, return values, formulas, controls and runnable examples are provided by the corresponding R help page, for example <code>help(&quot;sa_exposure_value&quot;, package = &quot;riskweightedassets&quot;)</code>.</p>
 <p>The API separates individual formulas from portfolio orchestration so that a bank analyst can inspect an input, select a rule set, apply a governed parameter override, reproduce a metric and inspect the resulting control trail. Formula structure itself remains version-controlled code; runtime parameter changes are accepted only through the explicit override interface.</p>
 </div>
 <div id="end-to-end-calculation-and-validation" class="section level2">
@@ -677,6 +689,45 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </tbody>
 </table>
 </div>
+<div id="credit-supporting-factors" class="section level2">
+<h2>Credit supporting factors</h2>
+<table>
+<colgroup>
+<col width="50%"></col>
+<col width="50%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Formula unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sme_supporting_factor()</code></td>
+<td>Weighted Article 501 SME factor using reviewed E* in EUR.</td>
+</tr>
+<tr class="even">
+<td><code>infrastructure_supporting_factor()</code></td>
+<td>Governed Article 501a infrastructure factor.</td>
+</tr>
+<tr class="odd">
+<td><code>apply_credit_supporting_factors()</code></td>
+<td>Apply independent SME and infrastructure factors once.</td>
+</tr>
+<tr class="even">
+<td><code>irb_risk_weighted_assets()</code></td>
+<td>EAD times RWA multiplier times K and eligible support factors.</td>
+</tr>
+</tbody>
+</table>
+<p>These are arithmetic helpers, not eligibility certificates. The table API requires explicit eligibility, evidence and approval; it validates the selected exposure context. See the installed <code>supporting-factors</code> vignette for migration, legacy warnings, audit outputs and the independent output-floor paths.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(riskweightedassets)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>factor &lt;-<span class="st"> </span><span class="kw">sme_supporting_factor</span>(<span class="dv">5000000</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">irb_risk_weighted_assets</span>(<span class="dv">1000000</span>, <span class="fl">0.08</span>, <span class="dt">sme_factor =</span> factor,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>                        <span class="dt">infrastructure_factor =</span> <span class="kw">infrastructure_supporting_factor</span>())</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co">#&gt; [1] 604462.5</span></span></code></pre></div>
+</div>
 <div id="counterparty-sft-cva-settlement-and-securitisation-formulas" class="section level2">
 <h2>Counterparty, SFT, CVA, settlement and securitisation formulas</h2>
 <table>
@@ -864,29 +915,29 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="controlled-analyst-example" class="section level2">
 <h2>Controlled analyst example</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(riskweightedassets)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>tables &lt;-<span class="st"> </span><span class="kw">generate_synthetic_tables</span>(<span class="dt">bank_profile =</span> <span class="st">&quot;KSA_BANK&quot;</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>overrides &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="dt">parameter_key =</span> <span class="st">&quot;SA_RW&quot;</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  <span class="dt">dimension_1 =</span> <span class="st">&quot;CORPORATE&quot;</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="dt">dimension_2 =</span> <span class="st">&quot;UNRATED&quot;</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  <span class="dt">parameter_value =</span> <span class="fl">0.40</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>adjusted_tables &lt;-<span class="st"> </span><span class="kw">override_regulatory_parameters</span>(</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  tables,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  overrides,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>  <span class="dt">reason =</span> <span class="st">&quot;Approved sensitivity scenario SCN-2026-09&quot;</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  <span class="dt">approved_by =</span> <span class="st">&quot;Model Risk Committee decision 2026-09-14&quot;</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>result &lt;-<span class="st"> </span><span class="kw">calculate_tables</span>(adjusted_tables)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="kw">rwa_summary</span>(result)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="kw">failed_controls</span>(result)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="kw">parameter_overrides</span>(result)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="kw">analyze_credit_risk</span>(result)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(riskweightedassets)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>tables &lt;-<span class="st"> </span><span class="kw">generate_synthetic_tables</span>(<span class="dt">bank_profile =</span> <span class="st">&quot;KSA_BANK&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>overrides &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  <span class="dt">parameter_key =</span> <span class="st">&quot;SA_RW&quot;</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  <span class="dt">dimension_1 =</span> <span class="st">&quot;CORPORATE&quot;</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  <span class="dt">dimension_2 =</span> <span class="st">&quot;UNRATED&quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  <span class="dt">parameter_value =</span> <span class="fl">0.40</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>adjusted_tables &lt;-<span class="st"> </span><span class="kw">override_regulatory_parameters</span>(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  tables,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>  overrides,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>  <span class="dt">reason =</span> <span class="st">&quot;Approved sensitivity scenario SCN-2026-09&quot;</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>  <span class="dt">approved_by =</span> <span class="st">&quot;Model Risk Committee decision 2026-09-14&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>result &lt;-<span class="st"> </span><span class="kw">calculate_tables</span>(adjusted_tables)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a><span class="kw">rwa_summary</span>(result)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a><span class="kw">failed_controls</span>(result)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a><span class="kw">parameter_overrides</span>(result)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a><span class="kw">analyze_credit_risk</span>(result)</span></code></pre></div>
 <p>The package is a transparent analytical reference implementation. Use with a real institution requires independent legal interpretation, data governance, model validation, change approval and regulatory reporting controls.</p>
 </div>
 
